@@ -1,0 +1,52 @@
+parents:
+    - aws/config
+
+config:
+    aws_data_subnet_names: "#keys(@aws_service_subnets || @aws_data_subnet_prefix);"
+
+database:
+    "@database_name":
+        provider: aurora
+        network: "@aws_network_names[0]"
+        subnets: "@aws_data_subnet_names"
+        port: "@database_port"
+        database_name: "@database"
+        user_name: "@database_user"
+        user_password: "@database_password"
+        family: "@aws_database_family"
+        engine: "@aws_database_engine"
+        engine_version: "@aws_database_engine_version"
+        cluster_parameters: "@aws_database_cluster_parameters"
+        instance_parameters: "@aws_database_instance_parameters"
+        create_timeout: "@aws_database_create_timeout"
+        update_timeout: "@aws_database_update_timeout"
+        delete_timeout: "@aws_database_delete_timeout"
+        retention_period: "@aws_database_retention_period"
+        backup_window: "@aws_database_backup_window"
+        maintenance_window: "@aws_database_maintenance_window"
+        engine_mode: "@aws_database_engine_mode"
+        enhanced_monitoring: "@aws_database_enhanced_monitoring"
+        monitoring_interval: "@aws_database_monitoring_interval"
+        instance_count: "@aws_database_instance_count"
+        instance_type: "@aws_database_instance_type"
+        groups: "@data_group"
+        firewalls:
+            - internet
+            - "@{data_firewall_prefix}@{database_name}"
+
+    "@queue_name":
+        provider: aws_redis
+        network: "@aws_network_names[0]"
+        subnets: "@aws_data_subnet_names"
+        port: "@queue_port"
+        engine_version: "@aws_queue_engine_version"
+        parameter_group_name: "@aws_queue_parameter_group_name"
+        instance_type: "@aws_queue_instance_type"
+        instance_count: "@aws_queue_instance_count"
+        retention_period: "@aws_queue_retention_period"
+        backup_window: "@aws_queue_backup_window"
+        maintenance_window: "@aws_queue_maintenance_window"
+        groups: "@data_group"
+        firewalls:
+            - internet
+            - "@{data_firewall_prefix}@{queue_name}"

@@ -1,0 +1,119 @@
+parents:
+    - module: aws
+      profile: domain
+
+    - aws/config
+
+config:
+    data_firewalls:
+        "@database_name": "@database_port"
+        "@queue_name": "@queue_port"
+
+    service_firewalls:
+        "@service_command_name":
+            internal: "@service_command_port"
+            external: "@service_command_external_port"
+        "@service_data_name":
+            internal: "@service_data_port"
+            external: "@service_data_external_port"
+
+    aws_service_api_subnet_names: "#keys(@aws_service_subnets || @aws_service_api_subnet_prefix);"
+    aws_service_worker_subnet_names: "#keys(@aws_service_subnets || @aws_service_worker_subnet_prefix);"
+
+domain:
+    "@root_domain":
+        when: "@provision_domain"
+        provider: "@domain_provider"
+        keep: true
+        certificate_authority: letsencrypt
+
+certificate:
+    "@cert_name":
+        when: "@provision_domain"
+        provider: aws
+        network: "@aws_network_names"
+        domain: "@root_domain"
+        groups: "@cert_group"
+
+subnet:
+    "@{aws_data_subnet_prefix}<<dict_key>>":
+        foreach: "@aws_service_subnets"
+        network: "@aws_network_names[0]"
+        cidr_prefix: "@data_subnet_cidr_prefix"
+        zone_suffix: "<<zone>>"
+        use_public_ip: "@data_subnet_public_ip"
+        nat_subnet: "?> not @data_subnet_public_ip ? 'nat-<<zone>>' | None"
+        groups: "@data_group"
+
+    "@{aws_service_api_subnet_prefix}<<dict_key>>":
+        foreach: "@aws_service_subnets"
+        network: "@aws_network_names[0]"
+        cidr_prefix: "@service_api_subnet_cidr_prefix"
+        zone_suffix: "<<zone>>"
+        use_public_ip: "@service_api_subnet_public_ip"
+        nat_subnet: "?> not @service_api_subnet_public_ip ? 'nat-<<zone>>' | None"
+        groups: "@service_group"
+
+    "@{aws_service_worker_subnet_prefix}<<dict_key>>":
+        foreach: "@aws_service_subnets"
+        network: "@aws_network_names[0]"
+        cidr_prefix: "@service_worker_subnet_cidr_prefix"
+        zone_suffix: "<<zone>>"
+        use_public_ip: "@service_worker_subnet_public_ip"
+        nat_subnet: "?> not @service_worker_subnet_public_ip ? 'nat-<<zone>>' | None"
+        groups: "@service_group"
+
+firewall:
+    "@{data_firewall_prefix}<<dict_key>>":
+        foreach: "@data_firewalls"
+        network: "@aws_network_names[0]"
+        groups: "@data_group"
+        rules:
+            tcp_in:
+                mode: ingress
+                protocol: tcp
+                from_port: "<<value>>"
+                to_port: "<<value>>"
+                cidrs: "&subnet(network=@aws_network_names[0]):@aws_service_api_subnet_names,@aws_service_worker_subnet_names:cidr"
+
+    "@{service_external_firewall_prefix}<<dict_key>>":
+        foreach: "@service_firewalls"
+        network: "@aws_network_names[0]"
+        groups: "@service_group"
+        rules:
+            tcp_in:
+                mode: ingress
+                protocol: tcp
+                from_port: "<<external>>"
+                to_port: "<<external>>"
+
+    "@{service_internal_firewall_prefix}<<dict_key>>":
+        foreach: "@service_firewalls"
+        requires: "@{service_external_firewall_prefix}<<dict_key>>"
+        network: "@aws_network_names[0]"
+        groups: "@service_group"
+        rules:
+            tcp_in:
+                mode: ingress
+                protocol: tcp
+                from_port: "<<internal>>"
+                to_port: "<<internal>>"
+                source_firewall: "@{service_external_firewall_prefix}<<dict_key>>"
+
+storage:
+    "@service_name":
+        provider: efs
+        network: "@aws_network_names[0]"
+        performance_mode: "@aws_storage_performance_mode"
+        throughput_mode: "@aws_storage_throughput_mode"
+        provisioned_throughput: "@aws_storage_provisioned_throughput"
+        encrypted: "@aws_storage_encrypted"
+        groups: "@service_group"
+
+mount:
+    "@service_name":
+        storage: "@service_name"
+        network: "@aws_network_names[0]"
+        subnet: "@aws_service_api_subnet_names,@aws_service_worker_subnet_names"
+        groups: "@service_group"
+        firewalls: "@storage_firewalls"

@@ -1,0 +1,75 @@
+parents:
+    - module: aws
+      profile: config
+
+    - config
+
+config:
+    # Core
+    domain_provider: route53
+
+    aws_networks:
+        - us-east-1
+
+    aws_network_names: "#prefix(@aws_networks || @aws_network_prefix);"
+
+    aws_nat_subnets:
+        - a
+        - b
+
+    aws_service_subnets: {}
+
+    # Data
+    aws_data_subnet_prefix: "data-"
+
+    aws_database_family: aurora-postgresql10
+    aws_database_engine: aurora-postgresql
+    aws_database_engine_version: 10.7
+    aws_database_create_timeout: "120m"
+    aws_database_update_timeout: "120m"
+    aws_database_delete_timeout: "120m"
+    aws_database_cluster_parameters: []
+    aws_database_instance_parameters: []
+    aws_database_retention_period: 5
+    aws_database_backup_window: "07:00-09:00"
+    aws_database_maintenance_window: "wed:04:00-wed:04:30"
+    aws_database_engine_mode: provisioned
+    aws_database_enhanced_monitoring: true
+    aws_database_monitoring_interval: 5
+    aws_database_instance_count: 2
+    aws_database_instance_type: db.t3.medium
+
+    aws_queue_engine_version: 5.0.6
+    aws_queue_parameter_group_name: default.redis5.0
+    aws_queue_instance_type: cache.t3.small
+    aws_queue_instance_count: 2
+    aws_queue_retention_period: 5
+    aws_queue_backup_window: "07:00-09:00"
+    aws_queue_maintenance_window: "wed:04:00-wed:05:00"
+
+    # Service
+    aws_service_api_subnet_prefix: "service-api-"
+    aws_service_worker_subnet_prefix: "service-worker-"
+
+    aws_service_command_machine: t2.medium
+    aws_service_command_tenancy: default
+    aws_service_command_monitoring: true
+    aws_service_command_ebs_optimized: false
+
+    aws_service_data_machine: t2.medium
+    aws_service_data_tenancy: default
+    aws_service_data_monitoring: true
+    aws_service_data_ebs_optimized: false
+
+    aws_service_worker_machine: t2.medium
+    aws_service_worker_tenancy: default
+    aws_service_worker_monitoring: true
+    aws_service_worker_ebs_optimized: false
+
+    aws_service_lb_timeout: 3600
+    aws_service_lb_health_path: /status
+    aws_service_lb_healthy_status: 200
+    aws_service_lb_health_check_interval: 30
+    aws_service_lb_health_timeout: 10
+    aws_service_lb_healthy_threshold: 3
+    aws_service_lb_unhealthy_threshold: 3
