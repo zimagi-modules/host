@@ -222,15 +222,8 @@ post_run:
         wait_port: "@service_command_external_port"
         timeout: 600
 
-    deploy:
-        when: "@deploy_zimagi"
-        requires: wait
-        command: deploy
-        destination: "@{platform_name}.@root_domain"
-        destination_name: "@service_cli_host_name"
-
     data-service:
-        requires: deploy
+        requires: wait
         module: docker
         task: services
         scopes:
@@ -245,7 +238,7 @@ post_run:
             - "@aws_ubuntu_user"
 
     worker-service:
-        requires: deploy
+        requires: wait
         module: docker
         task: services
         scopes:
@@ -258,3 +251,12 @@ post_run:
         remote_docker_compose: "@service_worker_manifest"
         docker_users:
             - "@aws_ubuntu_user"
+
+    deploy:
+        when: "@deploy_zimagi"
+        requires:
+            - data-service
+            - worker-service
+        command: deploy
+        destination: "@{platform_name}.@root_domain"
+        destination_name: "@service_cli_host_name"
