@@ -1,0 +1,15 @@
+version: "3.7"
+
+x-zimagi: &zimagi
+    image: ${ZIMAGI_DEFAULT_RUNTIME_IMAGE}
+    restart: always
+    env_file: .env
+    volumes:
+        - "${ZIMAGI_LIB_DIRECTORY}:/usr/local/lib/zimagi"
+
+services:
+    command-api:
+        <<: *zimagi
+        entrypoint: zimagi-command
+        ports:
+            - "${ZIMAGI_COMMAND_PORT}:5123"

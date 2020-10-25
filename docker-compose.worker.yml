@@ -1,0 +1,17 @@
+version: "3.7"
+
+x-zimagi: &zimagi
+    image: ${ZIMAGI_DEFAULT_RUNTIME_IMAGE}
+    restart: always
+    env_file: .env
+    volumes:
+        - "${ZIMAGI_LIB_DIRECTORY}:/usr/local/lib/zimagi"
+
+services:
+    scheduler:
+        <<: *zimagi
+        entrypoint: zimagi-scheduler
+
+    worker:
+        <<: *zimagi
+        entrypoint: zimagi-worker
