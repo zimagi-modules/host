@@ -114,6 +114,6 @@ mount:
     "@service_name":
         storage: "@service_name"
         network: "@aws_network_names[0]"
-        subnet: "@aws_service_api_subnet_names,@aws_service_worker_subnet_names"
+        subnet: "#join(@aws_service_api_subnet_names || @aws_service_worker_subnet_names);"
         groups: "@service_group"
         firewalls: "@storage_firewalls"
