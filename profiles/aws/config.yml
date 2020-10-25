@@ -13,11 +13,8 @@ config:
 
     aws_network_names: "#prefix(@aws_networks || @aws_network_prefix);"
 
-    aws_nat_subnets:
-        - a
-        - b
-
     aws_service_subnets: {}
+    aws_nat_subnets: "#values(@aws_service_subnets || zone);"
 
     # Data
     aws_data_subnet_prefix: "data-"
