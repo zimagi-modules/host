@@ -4,6 +4,7 @@ parents:
 config:
     aws_service_api_subnet_names: "#keys(@aws_service_subnets || @aws_service_api_subnet_prefix);"
     aws_service_worker_subnet_names: "#keys(@aws_service_subnets || @aws_service_worker_subnet_prefix);"
+
     api_ssh_firewall: "?> @service_api_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
     worker_ssh_firewall: "?> @service_worker_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
 
