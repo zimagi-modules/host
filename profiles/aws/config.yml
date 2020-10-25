@@ -35,7 +35,7 @@ config:
     aws_database_maintenance_window: "wed:04:00-wed:04:30"
     aws_database_engine_mode: provisioned
     aws_database_enhanced_monitoring: false
-    aws_database_monitoring_interval: 5
+    aws_database_monitoring_interval: 0
     aws_database_instance_count: 2
     aws_database_instance_type: db.t3.medium
 
