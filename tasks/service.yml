@@ -28,6 +28,9 @@ environment:
         env_file: ~/.env
 
 
+update:
+    <<: *update_command
+
 update-command-api:
     <<: *update_command
     servers:
@@ -44,6 +47,9 @@ update-worker:
         - groups.name="@{platform_name}-service-worker"
 
 
+restart:
+    <<: *restart_command
+
 restart-command:
     <<: *restart_command
     servers:
@@ -59,6 +65,9 @@ restart-worker:
     servers:
         - groups.name="@{platform_name}-service-worker"
 
+
+logs:
+    <<: *log_command
 
 command-logs:
     <<: *log_command
