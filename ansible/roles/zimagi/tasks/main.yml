@@ -1,0 +1,14 @@
+- name: install | Zimagi dependency packages
+  apt:
+      name: "{{ dependency_packages }}"
+      state: present
+      update_cache: yes
+  vars:
+      dependency_packages:
+          - python3-pip
+
+- name: install | Zimagi CLI {{ zimagi_version }}
+  pip:
+    name: zimagi
+    version: "{{ zimagi_version | default(omit) }}"
+    umask: "0022"

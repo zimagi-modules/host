@@ -1,0 +1,4 @@
+- name: Install Zimagi CLI client
+  hosts: all
+  roles:
+      - { role: zimagi }

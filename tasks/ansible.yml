@@ -1,0 +1,8 @@
+_ansible: &ansible
+    provider: ansible
+    roles: admin
+    directory: ansible
+
+zimagi-cli:
+    <<: *ansible
+    playbooks: zimagi-cli.yml
