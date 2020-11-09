@@ -8,6 +8,8 @@ config:
     api_ssh_firewall: "?> @service_api_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
     worker_ssh_firewall: "?> @service_worker_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
 
+    deploy_zimagi: false
+
 server:
     "@service_command_name":
         count: "@service_command_count"
@@ -128,21 +130,13 @@ load_balancer:
 post_run:
     credentials:
         command: server rotate
-        scopes:
-            network: "@aws_network_names[0]"
-        server_search:
-            - subnet.network.name=<network>
-            - groups.name=@service_group
+        server_search: groups.name=@service_group
 
     user-environment:
         requires: credentials
         module: cluster
         task: user-environment
-        scopes:
-            network: "@aws_network_names[0]"
-        servers:
-            - subnet.network.name=<network>
-            - groups.name=@service_group
+        servers: groups.name=@service_group
 
     app-environment:
         requires: credentials
@@ -203,11 +197,7 @@ post_run:
         requires: app-environment
         module: docker
         task: services
-        scopes:
-            network: "@aws_network_names[0]"
-        servers:
-            - subnet.network.name=<network>
-            - groups.name=@service_command_group
+        servers: groups.name=@service_command_group
         ntp_timezone: "@primary_timezone"
         app_user: "@aws_ubuntu_user"
         remote_docker_compose: "@service_command_manifest"
@@ -226,11 +216,7 @@ post_run:
         requires: wait
         module: docker
         task: services
-        scopes:
-            network: "@aws_network_names[0]"
-        servers:
-            - subnet.network.name=<network>
-            - groups.name=@service_data_group
+        servers: groups.name=@service_data_group
         ntp_timezone: "@primary_timezone"
         app_user: "@aws_ubuntu_user"
         remote_docker_compose: "@service_data_manifest"
@@ -241,11 +227,7 @@ post_run:
         requires: wait
         module: docker
         task: services
-        scopes:
-            network: "@aws_network_names[0]"
-        servers:
-            - subnet.network.name=<network>
-            - groups.name=@service_worker_group
+        servers: groups.name=@service_worker_group
         ntp_timezone: "@primary_timezone"
         app_user: "@aws_ubuntu_user"
         remote_docker_compose: "@service_worker_manifest"
@@ -258,5 +240,5 @@ post_run:
             - data-service
             - worker-service
         command: deploy
-        destination: "@{platform_name}.@root_domain"
+        destination: "?> @provision_domain ? '@{platform_name}.@root_domain' | '&load_balancer(network=@aws_network_names[0]):@platform_name:variables[lb_dns_name]'"
         destination_name: "@service_cli_host_name"
