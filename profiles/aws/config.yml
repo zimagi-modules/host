@@ -55,12 +55,12 @@ config:
     aws_service_command_monitoring: true
     aws_service_command_ebs_optimized: false
 
-    aws_service_data_machine: t2.medium
+    aws_service_data_machine: r5.large
     aws_service_data_tenancy: default
     aws_service_data_monitoring: true
     aws_service_data_ebs_optimized: false
 
-    aws_service_worker_machine: t2.medium
+    aws_service_worker_machine: r5.large
     aws_service_worker_tenancy: default
     aws_service_worker_monitoring: true
     aws_service_worker_ebs_optimized: false
