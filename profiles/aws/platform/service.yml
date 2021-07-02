@@ -2,11 +2,8 @@ parents:
     - aws/config
 
 config:
-    aws_service_api_subnet_names: "#keys(@aws_service_subnets || @aws_service_api_subnet_prefix);"
-    aws_service_worker_subnet_names: "#keys(@aws_service_subnets || @aws_service_worker_subnet_prefix);"
-
-    api_ssh_firewall: "?> @service_api_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
-    worker_ssh_firewall: "?> @service_worker_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
+    aws_service_subnet_names: "#keys(@aws_service_subnets || @aws_service_subnet_prefix);"
+    ssh_firewall: "?> @service_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
 
     deploy_zimagi: false
 
@@ -15,7 +12,7 @@ server:
         count: "@service_command_count"
         provider: ec2
         network: "@aws_network_names[0]"
-        subnet: "@aws_service_api_subnet_names"
+        subnet: "@aws_service_subnet_names"
         image: "@aws_ubuntu_image[<network>]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
@@ -34,14 +31,14 @@ server:
                 mode: "0770"
         firewalls:
             - internet
-            - "@api_ssh_firewall"
+            - "@ssh_firewall"
             - "@{service_internal_firewall_prefix}@{service_command_name}"
 
     "@service_data_name":
         count: "@service_data_count"
         provider: ec2
         network: "@aws_network_names[0]"
-        subnet: "@aws_service_api_subnet_names"
+        subnet: "@aws_service_subnet_names"
         image: "@aws_ubuntu_image[<network>]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
@@ -60,14 +57,14 @@ server:
                 mode: "0770"
         firewalls:
             - internet
-            - "@api_ssh_firewall"
+            - "@ssh_firewall"
             - "@{service_internal_firewall_prefix}@{service_data_name}"
 
     "@service_worker_name":
         count: "@service_worker_count"
         provider: ec2
         network: "@aws_network_names[0]"
-        subnet: "@aws_service_worker_subnet_names"
+        subnet: "@aws_service_subnet_names"
         image: "@aws_ubuntu_image[<network>]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
@@ -86,13 +83,13 @@ server:
                 mode: "0770"
         firewalls:
             - internet
-            - "@worker_ssh_firewall"
+            - "@ssh_firewall"
 
 load_balancer:
     "@platform_name":
         provider: aws_application
         network: "@aws_network_names[0]"
-        subnets: "@aws_service_api_subnet_names"
+        subnets: "@aws_service_subnet_names"
         domain: "?> @provision_domain ? '@root_domain' | None"
         internal: false
         idle_timeout: "@aws_service_lb_timeout"
@@ -154,9 +151,9 @@ post_run:
             ZIMAGI_POSTGRES_DB: "@database"
             ZIMAGI_POSTGRES_USER: "@database_user"
             ZIMAGI_POSTGRES_PASSWORD: "@database_password"
-            ZIMAGI_REDIS_TYPE: "@queue_type"
-            ZIMAGI_REDIS_HOST: "&database(network=<network>):@queue_name:host"
-            ZIMAGI_REDIS_PORT: "@queue_port"
+            ZIMAGI_REDIS_TYPE: "@memory_store_type"
+            ZIMAGI_REDIS_HOST: "&database(network=<network>):@memory_store_name:host"
+            ZIMAGI_REDIS_PORT: "@memory_store_port"
             ZIMAGI_LIB_DIRECTORY: "@service_lib_dir"
             ZIMAGI_ALLOWED_HOSTS: "@>>service_allowed_hosts"
             ZIMAGI_DEFAULT_ENV_NAME: "@environment"

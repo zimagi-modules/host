@@ -7,7 +7,7 @@ parents:
 config:
     data_firewalls:
         "@database_name": "@database_port"
-        "@queue_name": "@queue_port"
+        "@memory_store_name": "@memory_store_port"
 
     service_firewalls:
         "@service_command_name":
@@ -17,8 +17,7 @@ config:
             internal: "@service_data_port"
             external: "@service_data_external_port"
 
-    aws_service_api_subnet_names: "#keys(@aws_service_subnets || @aws_service_api_subnet_prefix);"
-    aws_service_worker_subnet_names: "#keys(@aws_service_subnets || @aws_service_worker_subnet_prefix);"
+    aws_service_subnet_names: "#keys(@aws_service_subnets || @aws_service_subnet_prefix);"
 
 domain:
     "@root_domain":
@@ -45,22 +44,13 @@ subnet:
         nat_subnet: "?> not @data_subnet_public_ip ? 'nat-<<zone>>' | None"
         groups: "@data_group"
 
-    "@{aws_service_api_subnet_prefix}<<dict_key>>":
+    "@{aws_service_subnet_prefix}<<dict_key>>":
         foreach: "@aws_service_subnets"
         network: "@aws_network_names[0]"
-        cidr_prefix: "@service_api_subnet_cidr_prefix"
+        cidr_prefix: "@service_subnet_cidr_prefix"
         zone_suffix: "<<zone>>"
-        use_public_ip: "@service_api_subnet_public_ip"
-        nat_subnet: "?> not @service_api_subnet_public_ip ? 'nat-<<zone>>' | None"
-        groups: "@service_group"
-
-    "@{aws_service_worker_subnet_prefix}<<dict_key>>":
-        foreach: "@aws_service_subnets"
-        network: "@aws_network_names[0]"
-        cidr_prefix: "@service_worker_subnet_cidr_prefix"
-        zone_suffix: "<<zone>>"
-        use_public_ip: "@service_worker_subnet_public_ip"
-        nat_subnet: "?> not @service_worker_subnet_public_ip ? 'nat-<<zone>>' | None"
+        use_public_ip: "@service_subnet_public_ip"
+        nat_subnet: "?> not @service_subnet_public_ip ? 'nat-<<zone>>' | None"
         groups: "@service_group"
 
 firewall:
@@ -74,7 +64,7 @@ firewall:
                 protocol: tcp
                 from_port: "<<value>>"
                 to_port: "<<value>>"
-                cidrs: "&subnet(network=@aws_network_names[0]):@aws_service_api_subnet_names,@aws_service_worker_subnet_names:cidr"
+                cidrs: "&subnet(network=@aws_network_names[0]):@aws_service_subnet_names:cidr"
 
     "@{service_external_firewall_prefix}<<dict_key>>":
         foreach: "@service_firewalls"
@@ -114,6 +104,6 @@ mount:
     "@service_name":
         storage: "@service_name"
         network: "@aws_network_names[0]"
-        subnet: "#join(@aws_service_api_subnet_names || @aws_service_worker_subnet_names);"
+        subnet: "@aws_service_subnet_names"
         groups: "@service_group"
         firewalls: "@storage_firewalls"

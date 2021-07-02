@@ -18,18 +18,16 @@ config:
     database_password: "%%database_password:30"
     database_port: 5432
 
-    queue_name: "@{platform_name}-queue"
-    queue_type: redis
-    queue_port: 6379
+    memory_store_name: "@{platform_name}-memory-store"
+    memory_store_type: redis
+    memory_store_port: 6379
 
     data_firewall_prefix: "data-"
 
     # Service
     service_cli_host_name: default
-    service_api_subnet_cidr_prefix: 26
-    service_api_subnet_public_ip: true
-    service_worker_subnet_cidr_prefix: 26
-    service_worker_subnet_public_ip: true
+    service_subnet_cidr_prefix: 24
+    service_subnet_public_ip: true
 
     service_name: "@{platform_name}-service"
     service_group: "@{platform_name}-service"

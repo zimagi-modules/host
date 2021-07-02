@@ -34,19 +34,19 @@ database:
             - internet
             - "@{data_firewall_prefix}@{database_name}"
 
-    "@queue_name":
+    "@memory_store_name":
         provider: aws_redis
         network: "@aws_network_names[0]"
         subnets: "@aws_data_subnet_names"
-        port: "@queue_port"
-        engine_version: "@aws_queue_engine_version"
-        parameter_group_name: "@aws_queue_parameter_group_name"
-        instance_type: "@aws_queue_instance_type"
-        instance_count: "@aws_queue_instance_count"
-        retention_period: "@aws_queue_retention_period"
-        backup_window: "@aws_queue_backup_window"
-        maintenance_window: "@aws_queue_maintenance_window"
+        port: "@memory_store_port"
+        engine_version: "@aws_memory_store_engine_version"
+        parameter_group_name: "@aws_memory_store_parameter_group_name"
+        instance_type: "@aws_memory_store_instance_type"
+        instance_count: "@aws_memory_store_instance_count"
+        retention_period: "@aws_memory_store_retention_period"
+        backup_window: "@aws_memory_store_backup_window"
+        maintenance_window: "@aws_memory_store_maintenance_window"
         groups: "@data_group"
         firewalls:
             - internet
-            - "@{data_firewall_prefix}@{queue_name}"
+            - "@{data_firewall_prefix}@{memory_store_name}"

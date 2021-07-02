@@ -38,17 +38,16 @@ config:
     aws_database_instance_count: 2
     aws_database_instance_type: db.t3.medium
 
-    aws_queue_engine_version: 5.0.6
-    aws_queue_parameter_group_name: default.redis5.0
-    aws_queue_instance_type: cache.t3.small
-    aws_queue_instance_count: 2
-    aws_queue_retention_period: 5
-    aws_queue_backup_window: "07:00-09:00"
-    aws_queue_maintenance_window: "wed:04:00-wed:05:00"
+    aws_memory_store_engine_version: 5.0.6
+    aws_memory_store_parameter_group_name: default.redis5.0
+    aws_memory_store_instance_type: cache.t3.small
+    aws_memory_store_instance_count: 2
+    aws_memory_store_retention_period: 5
+    aws_memory_store_backup_window: "07:00-09:00"
+    aws_memory_store_maintenance_window: "wed:04:00-wed:05:00"
 
     # Service
-    aws_service_api_subnet_prefix: "service-api-"
-    aws_service_worker_subnet_prefix: "service-worker-"
+    aws_service_subnet_prefix: "service-"
 
     aws_service_command_machine: t2.medium
     aws_service_command_tenancy: default

@@ -5,18 +5,15 @@ profile:
     base-network:
         module: aws
         profile: network
-        operations: run
 
     base-nat:
         requires: base-network
         when_type: OR
         when_not:
-            - "@service_api_subnet_public_ip"
-            - "@service_worker_subnet_public_ip"
+            - "@service_subnet_public_ip"
             - "@data_subnet_public_ip"
         module: aws
         profile: nat
-        operations: run
 
     platform-core:
         requires:
