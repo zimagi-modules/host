@@ -12,4 +12,4 @@ services:
         <<: *zimagi
         entrypoint: zimagi-command
         ports:
-            - "${ZIMAGI_COMMAND_PORT}:5123"
+            - "${ZIMAGI_COMMAND_PORT}:${ZIMAGI_COMMAND_PORT}"

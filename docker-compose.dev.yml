@@ -22,13 +22,13 @@ services:
         <<: *zimagi
         entrypoint: zimagi-command
         ports:
-            - "${ZIMAGI_COMMAND_PORT}:5123"
+            - "${ZIMAGI_COMMAND_PORT}:${ZIMAGI_COMMAND_PORT}"
 
     data-api:
         <<: *zimagi
         entrypoint: zimagi-data
         ports:
-            - "${ZIMAGI_DATA_PORT}:5323"
+            - "${ZIMAGI_DATA_PORT}:${ZIMAGI_DATA_PORT}"
 
     scheduler:
         <<: *zimagi

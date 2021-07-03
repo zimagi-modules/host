@@ -12,4 +12,4 @@ services:
         <<: *zimagi
         entrypoint: zimagi-data
         ports:
-            - "${ZIMAGI_DATA_PORT}:5323"
+            - "${ZIMAGI_DATA_PORT}:${ZIMAGI_DATA_PORT}"
