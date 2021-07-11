@@ -1,0 +1,34 @@
+parents:
+    - aws/config
+
+config:
+    # Network
+    service_subnet_cidr_prefix: 28
+    service_subnet_public_ip: true
+
+    worker_subnet_public_ip: true
+    data_subnet_public_ip: true
+
+    # In Memory Store (Queue & Cache)
+    memory_store_password: "%%memory_store_password:30"
+
+    # Server
+    aws_service_machine: t2.xlarge
+    aws_service_tenancy: default
+    aws_service_monitoring: true
+    aws_service_ebs_optimized: false
+
+    service_volume_dir: /var/lib/docker/volumes
+    aws_service_volume_ebs_type: gp2
+    aws_service_volume_ebs_data_size: 20
+    aws_service_volume_ebs_iops: null
+    aws_service_volume_ebs_encrypted: false
+    aws_service_volume_data_device: /dev/xvdb
+
+    aws_service_lib_ebs_type: gp2
+    aws_service_lib_ebs_data_size: 20
+    aws_service_lib_ebs_iops: null
+    aws_service_lib_ebs_encrypted: false
+    aws_service_lib_data_device: /dev/xvdc
+
+    service_development_manifest: https://raw.githubusercontent.com/zimagi/host/main/docker-compose.dev.yml
