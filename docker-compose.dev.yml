@@ -4,8 +4,6 @@ x-zimagi: &zimagi
     image: ${ZIMAGI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     environment:
-        ZIMAGI_COMMAND_PORT: ${ZIMAGI_COMMAND_PORT}
-        ZIMAGI_DATA_PORT: ${ZIMAGI_DATA_PORT}
         ZIMAGI_POSTGRES_HOST: data
         ZIMAGI_POSTGRES_PORT: 5432
         ZIMAGI_REDIS_HOST: objects
