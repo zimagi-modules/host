@@ -1,0 +1,118 @@
+parents:
+    - module: aws
+      profile: domain
+
+    - aws/platform/config
+
+domain:
+    "@root_domain":
+        when: "@provision_domain"
+        provider: "@domain_provider"
+        keep: true
+        certificate_authority: letsencrypt
+
+certificate:
+    "@platform_name":
+        when: "@provision_domain"
+        provider: aws
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        domain: "@root_domain"
+        groups:
+            - "@platform_name"
+            - "@service_group"
+
+subnet:
+    "@{aws_data_subnet_prefix}<<value>>":
+        foreach: "@aws_subnet_zones"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        cidr_prefix: "@data_subnet_cidr_prefix"
+        zone_suffix: "<<value>>"
+        use_public_ip: "@data_subnet_public_ip"
+        nat_subnet: "?> not @data_subnet_public_ip ? 'nat-<<value>>' | None"
+        groups:
+            - "@platform_name"
+            - "@data_group"
+
+    "@{aws_service_subnet_prefix}<<value>>":
+        foreach: "@aws_subnet_zones"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        cidr_prefix: "@service_subnet_cidr_prefix"
+        zone_suffix: "<<value>>"
+        use_public_ip: "@service_subnet_public_ip"
+        nat_subnet: "?> not @service_subnet_public_ip ? 'nat-<<value>>' | None"
+        groups:
+            - "@platform_name"
+            - "@service_group"
+
+firewall:
+    "@{data_firewall_prefix}<<dict_key>>":
+        foreach:
+            "@database_name": "@database_port"
+            "@memory_store_name": "@memory_store_port"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        groups:
+            - "@platform_name"
+            - "@data_group"
+        rules:
+            tcp_in:
+                mode: ingress
+                protocol: tcp
+                from_port: "<<value>>"
+                to_port: "<<value>>"
+                cidrs: "&subnet(network=#prefix(@aws_networks[0] || @aws_network_prefix);):#prefix(@aws_subnet_zones || @aws_service_subnet_prefix);:cidr"
+
+    "@{service_external_firewall_prefix}<<dict_key>>":
+        foreach:
+            "@service_command_name": "@service_command_external_port"
+            "@service_data_name": "@service_data_external_port"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        groups:
+            - "@platform_name"
+            - "@service_group"
+        rules:
+            tcp_in:
+                mode: ingress
+                protocol: tcp
+                from_port: "<<value>>"
+                to_port: "<<value>>"
+
+    "@{service_internal_firewall_prefix}<<dict_key>>":
+        foreach:
+            "@service_command_name": "@service_command_port"
+            "@service_data_name": "@service_data_port"
+        requires: "@{service_external_firewall_prefix}<<dict_key>>"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        groups:
+            - "@platform_name"
+            - "@service_group"
+        rules:
+            tcp_in:
+                mode: ingress
+                protocol: tcp
+                from_port: "<<value>>"
+                to_port: "<<value>>"
+                source_firewall: "@{service_external_firewall_prefix}<<dict_key>>"
+
+storage:
+    "@service_name":
+        provider: efs
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        performance_mode: "@aws_storage_performance_mode"
+        throughput_mode: "@aws_storage_throughput_mode"
+        provisioned_throughput: "@aws_storage_provisioned_throughput"
+        encrypted: "@aws_storage_encrypted"
+        groups:
+            - "@platform_name"
+            - "@service_group"
+
+mount:
+    "@service_name":
+        storage: "@service_name"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        subnet: "#prefix(@aws_subnet_zones || @aws_service_subnet_prefix);"
+        groups:
+            - "@platform_name"
+            - "@service_group"
+        firewalls:
+            - internet
+            - nfs
