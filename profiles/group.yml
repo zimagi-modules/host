@@ -1,0 +1,10 @@
+parents:
+    - config
+
+group:
+    "@platform_name":
+        "@data_group":
+        "@service_group":
+            - "@service_command_group"
+            - "@service_data_group"
+            - "@service_worker_group"

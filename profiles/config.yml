@@ -1,57 +1,68 @@
 config:
-    # Core
-    platform_name: default
+    platform_name: default # (required)
+    host_type: dev
+    deploy_zimagi: true
 
+    service_cli_host_name: "@platform_name"
+
+    service_name: "@{platform_name}-service"
+    service_command_name: "@{service_name}-command"
+    service_data_name: "@{service_name}-data"
+    service_worker_name: "@{service_name}-worker"
+
+    # Group
+    data_group: "@{platform_name}-data"
+
+    service_group: "@{platform_name}-service"
+    service_command_group: "@{service_group}-command"
+    service_data_group: "@{service_group}-data"
+    service_worker_group: "@{service_group}-worker"
+
+    # Domain
     provision_domain: true
 
-    cert_name: "@platform_name"
-    cert_group: "@{platform_name}-cert"
+    # Network
+    host_type_network_cidr_prefix:
+        dev: 28
+        qa: 26
+        prod: 16
 
-    # Data
-    data_group: "@{platform_name}-data"
-    data_subnet_cidr_prefix: 28
-    data_subnet_public_ip: false
+    # Firewall
+    data_firewall_prefix: "data-"
 
+    service_internal_firewall_prefix: "internal-"
+    service_external_firewall_prefix: "external-"
+
+    # Database
     database_name: "@{platform_name}-database"
     database: "%%database:30"
     database_user: "%%database_user:30"
     database_password: "%%database_password:30"
     database_port: 5432
 
+    # In Memory Store (Queue & Cache)
     memory_store_name: "@{platform_name}-memory-store"
     memory_store_type: redis
     memory_store_port: 6379
 
-    data_firewall_prefix: "data-"
-
-    # Service
-    service_cli_host_name: default
-    service_subnet_cidr_prefix: 24
-    service_subnet_public_ip: true
-
-    service_name: "@{platform_name}-service"
-    service_group: "@{platform_name}-service"
-    service_command_name: "@{service_name}-command"
-    service_command_group: "@{service_group}-command"
+    # Server
     service_command_port: 5123
     service_command_external_port: 5123
     service_command_count: 1
-    service_command_manifest: https://raw.githubusercontent.com/zimagi/host/master/docker-compose.command.yml
-    service_data_name: "@{service_name}-data"
-    service_data_group: "@{service_group}-data"
+    service_command_manifest: https://raw.githubusercontent.com/zimagi/host/main/docker-compose.command.yml
+
     service_data_port: 5323
     service_data_external_port: 443
     service_data_count: 1
-    service_data_manifest: https://raw.githubusercontent.com/zimagi/host/master/docker-compose.data.yml
-    service_worker_name: "@{service_name}-worker"
-    service_worker_group: "@{service_group}-worker"
+    service_data_manifest: https://raw.githubusercontent.com/zimagi/host/main/docker-compose.data.yml
+
     service_worker_count: 1
-    service_worker_manifest: https://raw.githubusercontent.com/zimagi/host/master/docker-compose.worker.yml
+    service_worker_manifest: https://raw.githubusercontent.com/zimagi/host/main/docker-compose.worker.yml
 
-    service_internal_firewall_prefix: "internal-"
-    service_external_firewall_prefix: "external-"
-
+    # Application
+    service_data_dir: /var/local/zimagi
     service_lib_dir: /usr/local/lib/zimagi
+
     service_secret_key: "%%secret_key:50"
     service_allowed_hosts:
         - "*"
@@ -83,11 +94,3 @@ config:
     service_email_timeout:
     service_email_subject_prefix: "[@{platform_name}]:"
     service_email_use_localtime: true
-
-group:
-    "@cert_group":
-    "@data_group":
-    "@service_group":
-        - "@service_command_group"
-        - "@service_data_group"
-        - "@service_worker_group"
