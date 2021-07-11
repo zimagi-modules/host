@@ -1,14 +1,11 @@
 parents:
-    - aws/config
-
-config:
-    aws_data_subnet_names: "#keys(@aws_service_subnets || @aws_data_subnet_prefix);"
+    - aws/platform/config
 
 database:
     "@database_name":
         provider: aurora
-        network: "@aws_network_names[0]"
-        subnets: "@aws_data_subnet_names"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        subnets: "#prefix(@aws_subnet_zones || @aws_data_subnet_prefix);"
         port: "@database_port"
         database_name: "@database"
         user_name: "@database_user"
@@ -36,8 +33,8 @@ database:
 
     "@memory_store_name":
         provider: aws_redis
-        network: "@aws_network_names[0]"
-        subnets: "@aws_data_subnet_names"
+        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        subnets: "#prefix(@aws_subnet_zones || @aws_data_subnet_prefix);"
         port: "@memory_store_port"
         engine_version: "@aws_memory_store_engine_version"
         parameter_group_name: "@aws_memory_store_parameter_group_name"
