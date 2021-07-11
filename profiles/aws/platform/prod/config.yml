@@ -1,0 +1,13 @@
+parents:
+    - aws/config
+
+config:
+    # Network
+    data_subnet_cidr_prefix: 20
+    data_subnet_public_ip: false
+
+    worker_subnet_cidr_prefix: 17
+    worker_subnet_public_ip: false
+
+    service_subnet_cidr_prefix: 18
+    service_subnet_public_ip: true
