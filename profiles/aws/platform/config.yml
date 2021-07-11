@@ -1,0 +1,30 @@
+parents:
+    - aws/config
+
+config:
+    # Database
+    aws_database_family: aurora-postgresql10
+    aws_database_engine: aurora-postgresql
+    aws_database_engine_version: 10.7
+    aws_database_create_timeout: "120m"
+    aws_database_update_timeout: "120m"
+    aws_database_delete_timeout: "120m"
+    aws_database_cluster_parameters: []
+    aws_database_instance_parameters: []
+    aws_database_retention_period: 5
+    aws_database_backup_window: "07:00-09:00"
+    aws_database_maintenance_window: "wed:04:00-wed:04:30"
+    aws_database_engine_mode: provisioned
+    aws_database_enhanced_monitoring: false
+    aws_database_monitoring_interval: 0
+    aws_database_instance_count: 2
+    aws_database_instance_type: db.t3.medium
+
+    # In Memory Store (Queue & Cache)
+    aws_memory_store_engine_version: 5.0.6
+    aws_memory_store_parameter_group_name: default.redis5.0
+    aws_memory_store_instance_type: cache.t3.small
+    aws_memory_store_instance_count: 2
+    aws_memory_store_retention_period: 5
+    aws_memory_store_backup_window: "07:00-09:00"
+    aws_memory_store_maintenance_window: "wed:04:00-wed:05:00"
