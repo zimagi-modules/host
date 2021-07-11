@@ -1,5 +1,13 @@
 parents:
-    - aws/config
+    - aws/platform/@host_type/config
+    - group
+
+config:
+    network_cidr_prefix: "@host_type_network_cidr_prefix[@host_type]"
+    network_group: "@platform_name"
+
+    aws_network_prefix: "@{platform_name}-"
+    aws_nat_zones: "@aws_subnet_zones"
 
 profile:
     base-network:
@@ -11,6 +19,7 @@ profile:
         when_type: OR
         when_not:
             - "@service_subnet_public_ip"
+            - "@worker_subnet_public_ip"
             - "@data_subnet_public_ip"
         module: aws
         profile: nat
@@ -19,20 +28,29 @@ profile:
         requires:
             - base-network
             - base-nat
-        profile: aws/platform/core
+        profile: aws/platform/@host_type/core
 
     platform-data:
         requires: platform-core
+        when: "?> '@host_type' in ('qa', 'prod') ? True | False"
         profile: aws/platform/data
 
     platform-service:
         requires: platform-data
-        profile: aws/platform/service
-        deploy_zimagi: true
+        profile: aws/platform/@host_type/service
 
 post_run:
     platform-server-rotate:
         command: user rotate
+        host: "@service_cli_host_name"
+
+    update_deploy_config:
+        requires: platform-server-rotate
+        command: config save
+        config_name: deploy_zimagi
+        config_value_type: bool
+        config_value: false
+        host: "@service_cli_host_name"
 
 post_destroy:
     platform-host:
