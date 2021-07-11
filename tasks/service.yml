@@ -7,11 +7,15 @@ _command: &command
 
 _update_command: &update_command
     <<: *command
-    command: docker-compose rm -fs && docker-compose pull && docker-compose up -d && docker image prune -fa && docker-compose restart
+    command: docker-compose rm -fs @service && docker-compose pull @service && docker-compose up -d @service && docker image prune -fa && docker-compose restart @service
+    options:
+        service: "command-api data-api scheduler worker"
 
 _restart_command: &restart_command
     <<: *command
-    command: docker-compose restart
+    command: docker-compose restart @service
+    options:
+        service: "command-api data-api scheduler worker"
 
 _log_command: &log_command
     <<: *command
@@ -33,16 +37,22 @@ update:
 
 update-command-api:
     <<: *update_command
+    options:
+        service: "command-api"
     servers:
         - groups.name="@{platform_name}-service-command"
 
 update-data-api:
     <<: *update_command
+    options:
+        service: "data-api"
     servers:
         - groups.name="@{platform_name}-service-data"
 
 update-worker:
     <<: *update_command
+    options:
+        service: "scheduler worker"
     servers:
         - groups.name="@{platform_name}-service-worker"
 
@@ -52,16 +62,22 @@ restart:
 
 restart-command:
     <<: *restart_command
+    options:
+        service: "command-api"
     servers:
         - groups.name="@{platform_name}-service-command"
 
 restart-data:
     <<: *restart_command
+    options:
+        service: "data-api"
     servers:
         - groups.name="@{platform_name}-service-data"
 
 restart-worker:
     <<: *restart_command
+    options:
+        service: "scheduler worker"
     servers:
         - groups.name="@{platform_name}-service-worker"
 
@@ -71,11 +87,15 @@ logs:
 
 command-logs:
     <<: *log_command
+    options:
+        service: "command-api"
     servers:
         - groups.name="@{platform_name}-service-command"
 
 data-logs:
     <<: *log_command
+    options:
+        service: "data-api"
     servers:
         - groups.name="@{platform_name}-service-data"
 
