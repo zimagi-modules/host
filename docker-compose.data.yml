@@ -5,6 +5,7 @@ x-zimagi: &zimagi
     restart: always
     env_file: .env
     volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
         - "${ZIMAGI_LIB_DIRECTORY}:/usr/local/lib/zimagi"
 
 services:
