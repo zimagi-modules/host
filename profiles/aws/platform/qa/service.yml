@@ -2,21 +2,19 @@ parents:
     - aws/config
 
 server:
-    "@service_command_name":
-        count: "@service_command_count"
+    "@platform_name":
+        count: "@service_count"
         provider: ec2
         network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
-        subnet: "#keys(@aws_service_subnets || @aws_service_subnet_prefix);"
-        image: "@aws_ubuntu_image[<network>]"
+        subnet: "#prefix(@aws_subnet_zones || @aws_service_subnet_prefix);"
+        image: "@aws_ubuntu_image[#lstrip(<network> || @aws_network_prefix);]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
-        machine: "@aws_service_command_machine"
-        tenancy: "@aws_service_command_tenancy"
-        monitoring: "@aws_service_command_monitoring"
-        ebs_optimized: "@aws_service_command_ebs_optimized"
-        groups:
-            - "@service_group"
-            - "@service_command_group"
+        machine: "@aws_service_machine"
+        tenancy: "@aws_service_tenancy"
+        monitoring: "@aws_service_monitoring"
+        ebs_optimized: "@aws_service_ebs_optimized"
+        groups: "@service_group"
         volumes:
             "@service_lib_dir":
                 type: nfs4
@@ -27,12 +25,13 @@ server:
             - internet
             - "?> @service_subnet_public_ip ? 'ssh-external' | 'ssh-internal'"
             - "@{service_internal_firewall_prefix}@{service_command_name}"
+            - "@{service_internal_firewall_prefix}@{service_data_name}"
 
 load_balancer:
     "@platform_name":
         provider: aws_application
         network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
-        subnets: "#keys(@aws_service_subnets || @aws_service_subnet_prefix);"
+        subnets: "#prefix(@aws_subnet_zones || @aws_service_subnet_prefix);"
         domain: "?> @provision_domain ? '@root_domain' | None"
         internal: false
         idle_timeout: "@aws_service_lb_timeout"
@@ -44,7 +43,7 @@ load_balancer:
         listeners:
             command:
                 port: "@service_command_external_port"
-                certificate: "@cert_name"
+                certificate: "@platform_name"
                 target_port: "@service_command_port"
                 target_protocol: https
                 health_check_path: "@aws_service_lb_health_path"
@@ -53,10 +52,10 @@ load_balancer:
                 healthy_status: "@aws_service_lb_healthy_status"
                 healthy_threshold: "@aws_service_lb_healthy_threshold"
                 unhealthy_threshold: "@aws_service_lb_unhealthy_threshold"
-                server_groups: "@service_command_group"
+                server_groups: "@service_group"
             data:
                 port: "@service_data_external_port"
-                certificate: "@cert_name"
+                certificate: "@platform_name"
                 target_port: "@service_data_port"
                 target_protocol: https
                 health_check_path: "@aws_service_lb_health_path"
@@ -65,7 +64,7 @@ load_balancer:
                 healthy_status: "@aws_service_lb_healthy_status"
                 healthy_threshold: "@aws_service_lb_healthy_threshold"
                 unhealthy_threshold: "@aws_service_lb_unhealthy_threshold"
-                server_groups: "@service_data_group"
+                server_groups: "@service_group"
 
 post_run:
     credentials:
@@ -137,10 +136,10 @@ post_run:
         requires: app-environment
         module: docker
         task: services
-        servers: groups.name=@service_command_group
+        servers: groups.name=@service_group
         ntp_timezone: "@primary_timezone"
         app_user: "@aws_ubuntu_user"
-        remote_docker_compose: "@service_command_manifest"
+        remote_docker_compose: "@service_qa_manifest"
         docker_users:
             - "@aws_ubuntu_user"
 
