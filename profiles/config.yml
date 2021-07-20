@@ -24,7 +24,7 @@ config:
     # Network
     host_type_network_cidr_prefix:
         dev: 28
-        qa: 26
+        qa: 24
         prod: 16
 
     # Firewall
