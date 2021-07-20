@@ -10,3 +10,13 @@ config:
 
     data_subnet_cidr_prefix: 27
     data_subnet_public_ip: false
+
+    # Server
+    service_count: 1
+
+    aws_service_machine: t2.xlarge
+    aws_service_tenancy: default
+    aws_service_monitoring: true
+    aws_service_ebs_optimized: false
+
+    service_qa_manifest: https://raw.githubusercontent.com/zimagi/host/main/docker-compose.qa.yml
