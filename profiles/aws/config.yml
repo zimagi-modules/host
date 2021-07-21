@@ -16,26 +16,6 @@ config:
         - b
         - c
 
-    aws_data_subnet_prefix: "data-"
-    aws_worker_subnet_prefix: "worker-"
-    aws_service_subnet_prefix: "service-"
-
-    # Server
-    aws_service_command_machine: t2.medium
-    aws_service_command_tenancy: default
-    aws_service_command_monitoring: true
-    aws_service_command_ebs_optimized: false
-
-    aws_service_data_machine: r5.large
-    aws_service_data_tenancy: default
-    aws_service_data_monitoring: true
-    aws_service_data_ebs_optimized: false
-
-    aws_service_worker_machine: r5.large
-    aws_service_worker_tenancy: default
-    aws_service_worker_monitoring: true
-    aws_service_worker_ebs_optimized: false
-
     # Load Balancer
     aws_service_lb_timeout: 3600
     aws_service_lb_health_path: /status
