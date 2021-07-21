@@ -11,8 +11,8 @@ domain:
         keep: true
 
 subnet:
-    "@{aws_service_subnet_prefix}@{aws_subnet_zones[0]}":
-        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+    "@{service_subnet_prefix}@{aws_subnet_zones[0]}":
+        network: "#prefix(@aws_networks[0] || @network_prefix);"
         cidr_prefix: "@service_subnet_cidr_prefix"
         zone_suffix: "@aws_subnet_zones[0]"
         use_public_ip: "@service_subnet_public_ip"
@@ -25,7 +25,7 @@ firewall:
         foreach:
             "@service_command_name": "@service_command_external_port"
             "@service_data_name": "@service_data_external_port"
-        network: "#prefix(@aws_networks[0] || @aws_network_prefix);"
+        network: "#prefix(@aws_networks[0] || @network_prefix);"
         groups:
             - "@platform_name"
             - "@service_group"

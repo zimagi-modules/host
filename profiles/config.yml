@@ -27,6 +27,10 @@ config:
         qa: 24
         prod: 16
 
+    data_subnet_prefix: "data-"
+    worker_subnet_prefix: "worker-"
+    service_subnet_prefix: "service-"
+
     # Firewall
     data_firewall_prefix: "data-"
 
