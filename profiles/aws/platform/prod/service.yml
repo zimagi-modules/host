@@ -1,13 +1,13 @@
 parents:
-    - aws/config
+    - aws/platform/prod/config
 
 server:
     "@service_command_name":
         count: "@service_command_count"
         provider: ec2
-        network: "#prefix(@aws_networks[0] || @network_prefix);"
-        subnet: "#prefix(@aws_subnet_zones || @service_subnet_prefix);"
-        image: "@aws_ubuntu_image[#lstrip(<network> || @network_prefix);]"
+        network: "#prefix(@aws_networks[0], @network_prefix)"
+        subnet: "#prefix(@aws_subnet_zones, @service_subnet_prefix)"
+        image: "@aws_ubuntu_image[#lstrip(<network>, @network_prefix)]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
         machine: "@aws_service_command_machine"
@@ -31,9 +31,9 @@ server:
     "@service_data_name":
         count: "@service_data_count"
         provider: ec2
-        network: "#prefix(@aws_networks[0] || @network_prefix);"
-        subnet: "#prefix(@aws_subnet_zones || @service_subnet_prefix);"
-        image: "@aws_ubuntu_image[#lstrip(<network> || @network_prefix);]"
+        network: "#prefix(@aws_networks[0], @network_prefix)"
+        subnet: "#prefix(@aws_subnet_zones, @service_subnet_prefix)"
+        image: "@aws_ubuntu_image[#lstrip(<network>, @network_prefix)]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
         machine: "@aws_service_data_machine"
@@ -57,9 +57,9 @@ server:
     "@service_worker_name":
         count: "@service_worker_count"
         provider: ec2
-        network: "#prefix(@aws_networks[0] || @network_prefix);"
-        subnet: "#prefix(@aws_subnet_zones || @worker_subnet_prefix);"
-        image: "@aws_ubuntu_image[#lstrip(<network> || @network_prefix);]"
+        network: "#prefix(@aws_networks[0], @network_prefix)"
+        subnet: "#prefix(@aws_subnet_zones, @worker_subnet_prefix)"
+        image: "@aws_ubuntu_image[#lstrip(<network>, @network_prefix)]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
         machine: "@aws_service_worker_machine"
@@ -72,7 +72,7 @@ server:
         volumes:
             "@service_lib_dir":
                 type: nfs4
-                location: "&{storage_mount(network=<network>;subnet=#substitute(<subnet> || @worker_subnet_prefix || @service_subnet_prefix);):@{service_name}:remote_host}:/"
+                location: "&{storage_mount(network=<network>;subnet=#substitute(<subnet>, @worker_subnet_prefix, @service_subnet_prefix)):@{service_name}:remote_host}:/"
                 options: "@aws_efs_volume_options"
                 mode: "0770"
         firewalls:
@@ -82,8 +82,8 @@ server:
 load_balancer:
     "@platform_name":
         provider: aws_application
-        network: "#prefix(@aws_networks[0] || @network_prefix);"
-        subnets: "#prefix(@aws_subnet_zones || @service_subnet_prefix);"
+        network: "#prefix(@aws_networks[0], @network_prefix)"
+        subnets: "#prefix(@aws_subnet_zones, @service_subnet_prefix)"
         domain: "?> @provision_domain ? '@root_domain' | None"
         internal: false
         idle_timeout: "@aws_service_lb_timeout"
@@ -133,7 +133,7 @@ post_run:
         requires: credentials
         task: environment
         scopes:
-            network: "#prefix(@aws_networks[0] || @network_prefix);"
+            network: "#prefix(@aws_networks[0], @network_prefix)"
         servers:
             - subnet.network.name=<network>
             - groups.name=@service_group
@@ -199,7 +199,7 @@ post_run:
         requires: command-service
         module: cluster
         task: wait-https
-        wait_hosts: "&load_balancer(network=#prefix(@aws_networks[0] || @network_prefix);):@platform_name:variables[lb_dns_name]"
+        wait_hosts: "&load_balancer(network=#prefix(@aws_networks[0], @network_prefix)):@platform_name:variables[lb_dns_name]"
         wait_port: "@service_command_external_port"
         timeout: 600
 
@@ -231,5 +231,5 @@ post_run:
             - data-service
             - worker-service
         command: deploy
-        destination: "?> @provision_domain ? '@{platform_name}.@root_domain' | '&load_balancer(network=#prefix(@aws_networks[0] || @network_prefix);):@platform_name:variables[lb_dns_name]'"
+        destination: "?> @provision_domain ? '@{platform_name}.@root_domain' | '&load_balancer(network=#prefix(@aws_networks[0], @network_prefix)):@platform_name:variables[lb_dns_name]'"
         destination_name: "@service_cli_host_name"
