@@ -1,6 +1,6 @@
 parents:
-    - aws/platform/@host_type/config
     - group
+    - aws/platform/@host_type/config
 
 config:
     network_cidr_prefix: "@host_type_network_cidr_prefix[@host_type]"
