@@ -7,7 +7,7 @@ config:
     data_subnet_public_ip: false
 
     worker_subnet_cidr_prefix: 20
-    worker_subnet_public_ip: false
+    worker_subnet_public_ip: true
 
     service_subnet_cidr_prefix: 20
     service_subnet_public_ip: true
