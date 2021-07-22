@@ -1,5 +1,5 @@
 parents:
-    - aws/config
+    - aws/platform/config
 
 config:
     # Network
