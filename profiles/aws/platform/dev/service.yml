@@ -5,11 +5,11 @@ server:
     "@platform_name":
         count: 1
         provider: ec2
-        network: "#prefix(@aws_networks[0] || @network_prefix);"
-        subnet: "#prefix(@aws_subnet_zones[0] || @service_subnet_prefix);"
+        network: "#prefix(@aws_networks[0], @network_prefix)"
+        subnet: "#prefix(@aws_subnet_zones[0], @service_subnet_prefix)"
         domain: "?> @provision_domain ? '@root_domain' | None"
         domain_name: "@platform_name"
-        image: "@aws_ubuntu_image[#lstrip(<network> || @network_prefix);]"
+        image: "@aws_ubuntu_image[#lstrip(<network>, @network_prefix)]"
         ssh_port: "@ssh_port"
         user: "@aws_ubuntu_user"
         machine: "@aws_service_machine"
@@ -55,7 +55,7 @@ post_run:
         requires: credentials
         task: environment
         scopes:
-            network: "#prefix(@aws_networks[0] || @network_prefix);"
+            network: "#prefix(@aws_networks[0], @network_prefix)"
         servers:
             - subnet.network.name=<network>
             - groups.name=@service_group
@@ -117,7 +117,7 @@ post_run:
         requires: start-service
         module: cluster
         task: wait-https
-        wait_hosts: "&server(network=#prefix(@aws_networks[0] || @network_prefix);;subnet=#prefix(@aws_subnet_zones[0] || @service_subnet_prefix);):@{platform_name}1:ip"
+        wait_hosts: "&server(network=#prefix(@aws_networks[0], @network_prefix);subnet=#prefix(@aws_subnet_zones[0], @service_subnet_prefix)):@{platform_name}1:ip"
         wait_port: "@service_command_external_port"
         timeout: 600
 
@@ -125,5 +125,5 @@ post_run:
         when: "@deploy_zimagi"
         requires: wait
         command: deploy
-        destination: "?> @provision_domain ? '@{platform_name}.@root_domain' | '&server(network=#prefix(@aws_networks[0] || @network_prefix);;subnet=#prefix(@aws_subnet_zones[0] || @service_subnet_prefix);):@{platform_name}1:ip'"
+        destination: "?> @provision_domain ? '@{platform_name}.@root_domain' | '&server(network=#prefix(@aws_networks[0], @network_prefix);subnet=#prefix(@aws_subnet_zones[0], @service_subnet_prefix)):@{platform_name}1:ip'"
         destination_name: "@service_cli_host_name"
