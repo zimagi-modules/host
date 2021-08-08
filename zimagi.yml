@@ -1,8 +1,8 @@
 name: host
 
 modules:
-    - remote: https://github.com/dccs-tech/zimagi-cluster-aws.git
+    - remote: https://github.com/zimagi-modules/cluster-aws.git
       reference: main
 
-    - remote: https://github.com/dccs-tech/zimagi-docker.git
+    - remote: https://github.com/zimagi-modules/docker.git
       reference: main
